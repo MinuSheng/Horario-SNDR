@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horario de Snayder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --chile-color: #ec4899;
+            
+            --home: #10b981;
+            --bus: #f59e0b;
+            --work: #ef4444;
+            --free: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.2rem;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Shift Selector */
+        .selector-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.8);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+        }
+
+        /* Timezone Switch */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .zone-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.3s, opacity 0.3s;
+        }
+
+        .zone-nica { color: var(--accent); }
+        .zone-chile { color: var(--chile-color); }
+        
+        .inactive-zone { opacity: 0.4; }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--accent);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background-color: var(--chile-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Live Status */
+        .live-status {
+            text-align: center;
+            padding: 2rem 1rem;
+            position: relative;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .status-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            min-height: 4.5rem;
+        }
+
+        .main-clock {
+            font-size: 3rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -1px;
+            margin-bottom: 0.2rem;
+            transition: color 0.3s;
+        }
+
+        .clock-label-big {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+        }
+
+        /* Timetable */
+        .timetable {
+            margin-top: 1.5rem;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.2rem;
+            position: relative;
+            transition: opacity 0.3s;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .time-col {
+            min-width: 130px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .desc-col {
+            padding-left: 1rem;
+            border-left: 3px solid;
+            padding-bottom: 0.5rem;
+        }
+
+        .desc-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .desc-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Branding */
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .brand-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #475569 20%, #e2e8f0 50%, #475569 80%);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: sweepRightToLeft 3s linear infinite;
+        }
+
+        @keyframes sweepRightToLeft {
+            0% { background-position: 200% center; }
+            100% { background-position: 0% center; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Horario de Snayder</h1>
+            <p>Sincronizado en tiempo real</p>
+        </div>
+
+        <div class="card">
+            <div class="selector-group">
+                <label for="shift-select">Selecciona el Turno</label>
+                <select id="shift-select" onchange="updateUI()">
+                    <option value="A">Turno A (Mañana)</option>
+                    <option value="B">Turno B (Tarde)</option>
+                    <option value="C">Turno C (Noche)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="switch-container">
+            <span class="zone-label zone-nica" id="label-nica">Mi Hora (Nica)</span>
+            <label class="switch">
+                <input type="checkbox" id="timezone-toggle" onchange="updateUI()">
+                <span class="slider round"></span>
+            </label>
+            <span class="zone-label zone-chile inactive-zone" id="label-chile">Tu Hora (Chile)</span>
+        </div>
+
+        <div class="card live-status">
+            <div class="status-badge" id="status-badge">Calculando...</div>
+            <div class="status-text" id="status-text">Cargando estado...</div>
+            
+            <div class="main-clock" id="main-clock">--:--</div>
+            <div class="clock-label-big" id="main-clock-label">ZONA HORARIA</div>
+        </div>
+
+        <div class="card">
+            <label style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.8rem; display: block;">Línea de Tiempo del Día</label>
+            <div class="timetable" id="timetable">
+                <!-- Se llena con JS -->
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="brand-logo">SNDR LABS</div>
+        </div>
+    </div>
+
+    <script>
+        // Definición de horarios en orden cronológico lógico para cada turno
+        // wraps: true significa que el bloque de tiempo cruza la medianoche
+        const schedules = {
+            'A': {
+                routine_normal: [
+                    { start: 600, end: 700, state: 'En recorrido', color: 'var(--bus)', msg: 'Esperando el recorrido (6:00 AM) hacia el trabajo 🚌' },
+                    { start: 700, end: 1500, state: 'En el trabajo', color: 'var(--work)', msg: 'Trabajando en el Turno A 👨‍💻' },
+                    { start: 1500, end: 1600, state: 'En recorrido', color: 'var(--bus)', msg: 'Ya salió, de regreso a casa 🚌' },
+                    { start: 1600, end: 600, state: 'En casa', color: 'var(--home)', msg: 'Llegó a casa. Tiempo libre y de descanso ❤️', wraps: true }
+                ],
+                routine_sunday: [
+                    { start: 600, end: 700, state: 'En recorrido', color: 'var(--bus)', msg: 'Yendo a su turno de 12 horas 🚌' },
+                    { start: 700, end: 1900, state: 'En el trabajo', color: 'var(--work)', msg: 'En su turno largo de 12 horas 👨‍💻' },
+                    { start: 1900, end: 2000, state: 'En recorrido', color: 'var(--bus)', msg: 'Regresando exhausto a casa 🚌' },
+                    { start: 2000, end: 600, state: 'En casa', color: 'var(--home)', msg: 'Por fin en casa descansando ❤️', wraps: true }
+                ]
+            },
+            'B': {
+                routine_normal: [
+                    { start: 1400, end: 1500, state: 'En recorrido', color: 'var(--bus)', msg: 'Esperando el recorrido (2:00 PM) hacia el trabajo 🚌' },
+                    { start: 1500, end: 2300, state: 'En el trabajo', color: 'var(--work)', msg: 'Trabajando en el Turno B 👨‍💻' },
+                    { start: 2300, end: 130, state: 'En recorrido', color: 'var(--bus)', msg: 'De regreso. Va a llegar tarde, a eso de la 1:30 AM a casa 🌙🚌', wraps: true },
+                    { start: 130, end: 1400, state: 'En casa', color: 'var(--home)', msg: 'Durmiendo y descansando en casa 😴' }
+                ]
+            },
+            'C': {
+                routine_normal: [
+                    { start: 2130, end: 2300, state: 'En recorrido', color: 'var(--bus)', msg: 'Esperando el recorrido (9:30 PM) hacia el trabajo 🚌' },
+                    { start: 2300, end: 700, state: 'En el trabajo', color: 'var(--work)', msg: 'En el trabajo. Turno de madrugada 👨‍💻🌙', wraps: true },
+                    { start: 700, end: 800, state: 'En recorrido', color: 'var(--bus)', msg: 'Salió de turno, yendo a casa (Llega a las 8:00 AM) 🚌' },
+                    { start: 800, end: 2130, state: 'En casa', color: 'var(--home)', msg: 'Durmiendo de día en casa 😴' }
+                ]
+            }
+        };
+
+        // Formatea la hora a 12h (AM/PM) sumando 2h si es para Chile
+        function format12h(val, useChile) {
+            let h = Math.floor(val / 100);
+            let m = val % 100;
+            
+            if (useChile) {
+                h = (h + 2) % 24;
+            }
+            
+            let ampm = h >= 12 ? 'PM' : 'AM';
+            let h12 = h % 12;
+            h12 = h12 ? h12 : 12; // el 0 se convierte en 12
+            
+            return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+        }
+
+        function isCurrentBlockActive(timeVal, block) {
+            if (block.wraps) {
+                return (timeVal >= block.start || timeVal < block.end);
+            }
+            return (timeVal >= block.start && timeVal < block.end);
+        }
+
+        function updateUI() {
+            try {
+                const shiftId = document.getElementById('shift-select').value;
+                const useChileTime = document.getElementById('timezone-toggle').checked;
+                const shift = schedules[shiftId];
+                
+                // Actualizar labels del toggle
+                const lblNica = document.getElementById('label-nica');
+                const lblChile = document.getElementById('label-chile');
+                const mainClock = document.getElementById('main-clock');
+                const mainClockLabel = document.getElementById('main-clock-label');
+                
+                if (useChileTime) {
+                    lblNica.classList.add('inactive-zone');
+                    lblChile.classList.remove('inactive-zone');
+                    mainClock.style.color = 'var(--chile-color)';
+                    mainClockLabel.innerText = 'HORA EN CHILE';
+                } else {
+                    lblNica.classList.remove('inactive-zone');
+                    lblChile.classList.add('inactive-zone');
+                    mainClock.style.color = 'var(--accent)';
+                    mainClockLabel.innerText = 'HORA EN NICARAGUA';
+                }
+
+                // Cálculo de tiempo robusto para iOS
+                const now = new Date();
+                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                const nicaDate = new Date(utc + (3600000 * -6));
+                
+                const hours = nicaDate.getHours();
+                const minutes = nicaDate.getMinutes();
+                const day = nicaDate.getDay(); // 0 = Domingo, 5 = Viernes
+                const currentTimeVal = (hours * 100) + minutes;
+
+                // Actualizar reloj principal
+                mainClock.innerText = format12h(currentTimeVal, useChileTime);
+
+                // Determinar rutina activa
+                let routine = shift.routine_normal;
+                let isFreeDay = false;
+                let currentStatus = { state: 'Libre', color: 'var(--free)', msg: '¡Hoy está libre! En casa descansando.' };
+
+                if (shiftId === 'A') {
+                    if (day === 5) { isFreeDay = true; } 
+                    else if (day === 0) { routine = shift.routine_sunday; }
+                } else if (shiftId === 'B' || shiftId === 'C') {
+                    if (day === 0) { isFreeDay = true; }
+                }
+
+                // Encontrar bloque actual si no es día libre
+                if (!isFreeDay) {
+                    for (let block of routine) {
+                        if (isCurrentBlockActive(currentTimeVal, block)) {
+                            currentStatus = block;
+                            break;
+                        }
+                    }
+                }
+
+                // Actualizar UI del estado actual
+                const badge = document.getElementById('status-badge');
+                badge.innerText = currentStatus.state;
+                badge.style.color = currentStatus.color;
+                badge.style.border = `1px solid ${currentStatus.color}`;
+                document.getElementById('status-text').innerText = currentStatus.msg;
+
+                // Renderizar Línea de Tiempo
+                const timetableBox = document.getElementById('timetable');
+                timetableBox.innerHTML = '';
+                
+                const timelineColor = useChileTime ? 'var(--chile-color)' : 'var(--accent)';
+                
+                if (isFreeDay) {
+                    timetableBox.innerHTML = `<div style="text-align:center; padding: 1rem; color: var(--free); font-weight: 600;">✨ Hoy es su día libre ✨</div>`;
+                } else {
+                    routine.forEach(block => {
+                        let isActive = isCurrentBlockActive(currentTimeVal, block);
+                        let timeStr = `${format12h(block.start, useChileTime)} - ${format12h(block.end, useChileTime)}`;
+                        
+                        let html = `
+                            <div class="timeline-item" style="opacity: ${isActive ? '1' : '0.4'};">
+                                <div class="time-col" style="color: ${timelineColor};">
+                                    ${timeStr}
+                                </div>
+                                <div class="desc-col" style="border-left-color: ${block.color}">
+                                    <div class="desc-title" style="color: ${block.color}">${block.state}</div>
+                                    <div class="desc-sub">${block.msg}</div>
+                                </div>
+                            </div>
+                        `;
+                        timetableBox.innerHTML += html;
+                    });
+                }
+            } catch (error) {
+                console.error("Error updating UI:", error);
+                document.getElementById('status-text').innerText = "Error cargando la hora. Refresca la página.";
+            }
+        }
+
+        // Inicializar cuando el DOM esté listo (Solución para iOS)
+        document.addEventListener("DOMContentLoaded", () => {
+            updateUI();
+            setInterval(updateUI, 60000); // Actualizar cada minuto
+        });
+    </script>
+</body>
+</html>
