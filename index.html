@@ -275,6 +275,22 @@
             100% { background-position: 0% center; }
         }
 
+        .shift-picker { position:relative; }
+        .shift-trigger { width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;padding:1rem 1.15rem;background:rgba(15,23,42,.85);border:1px solid rgba(148,163,184,.25);border-radius:14px;color:#f8fafc;font:inherit;font-size:1rem;cursor:pointer;transition:border-color .25s,box-shadow .25s; }
+        .shift-trigger:focus-visible,.shift-picker.open .shift-trigger {outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(56,189,248,.13);}
+        .shift-chevron {font-size:1.5rem;color:var(--accent);line-height:1;transition:transform .3s cubic-bezier(.2,.8,.2,1);}
+        .shift-picker.open .shift-chevron {transform:rotate(180deg);}
+        .shift-menu {position:absolute;top:calc(100% + 9px);left:0;right:0;z-index:20;padding:7px;background:#172235;border:1px solid rgba(148,163,184,.22);border-radius:17px;box-shadow:0 20px 45px rgba(0,0,0,.45);opacity:0;visibility:hidden;transform:translateY(-9px) scale(.98);transform-origin:top;transition:opacity .25s,transform .3s cubic-bezier(.2,.8,.2,1),visibility .3s;}
+        .shift-picker.open .shift-menu {opacity:1;visibility:visible;transform:translateY(0) scale(1);}
+        .shift-option {width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;padding:12px 13px;border:0;border-radius:11px;background:transparent;color:#f8fafc;font:inherit;cursor:pointer;transition:background .2s;}
+        .shift-option + .shift-option {margin-top:3px;}
+        .shift-option strong,.shift-option small {display:block;}
+        .shift-option strong {font-size:.95rem;font-weight:600;}
+        .shift-option small {font-size:.73rem;color:#94a3b8;margin-top:2px;}
+        .shift-option:hover,.shift-option:focus-visible,.shift-option.selected {background:rgba(56,189,248,.11);outline:none;}
+        .option-check {opacity:0;color:#38bdf8;font-size:1.2rem;}
+        .shift-option.selected .option-check {opacity:1;}
+        @media (prefers-reduced-motion:reduce) {.shift-menu,.shift-chevron,.shift-option {transition:none;}}
     </style>
 </head>
 <body>
@@ -288,21 +304,27 @@
         <div class="card">
             <div class="selector-group">
                 <label for="shift-select">Selecciona el Turno</label>
-                <select id="shift-select" onchange="updateUI()">
-                    <option value="A">Turno A (Mañana)</option>
-                    <option value="B">Turno B (Tarde)</option>
-                    <option value="C">Turno C (Noche)</option>
-                </select>
+                <div class="shift-picker" id="shift-picker">
+                    <button type="button" class="shift-trigger" id="shift-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="shift-menu">
+                        <span id="shift-current">Turno B (Tarde)</span><span class="shift-chevron" aria-hidden="true">⌄</span>
+                    </button>
+                    <div class="shift-menu" id="shift-menu" role="listbox" aria-label="Selecciona el turno">
+                        <button type="button" class="shift-option" role="option" data-shift="A" aria-selected="false"><span><strong>Turno A</strong><small>Mañana · 7:00 AM – 3:00 PM</small></span><span class="option-check">✓</span></button>
+                        <button type="button" class="shift-option selected" role="option" data-shift="B" aria-selected="true"><span><strong>Turno B</strong><small>Tarde · 3:00 PM – 11:00 PM</small></span><span class="option-check">✓</span></button>
+                        <button type="button" class="shift-option" role="option" data-shift="C" aria-selected="false"><span><strong>Turno C</strong><small>Noche · 11:00 PM – 7:00 AM</small></span><span class="option-check">✓</span></button>
+                    </div>
+                    <input type="hidden" id="shift-select" value="B">
+                </div>
             </div>
         </div>
 
         <div class="switch-container">
-            <span class="zone-label zone-nica" id="label-nica">Mi Hora (Nica)</span>
+            <span class="zone-label zone-nica" id="label-nica">Hora Nicaragua</span>
             <label class="switch">
                 <input type="checkbox" id="timezone-toggle" onchange="updateUI()">
                 <span class="slider round"></span>
             </label>
-            <span class="zone-label zone-chile inactive-zone" id="label-chile">Tu Hora (Chile)</span>
+            <span class="zone-label zone-chile inactive-zone" id="label-chile">Hora Chile</span>
         </div>
 
         <div class="card live-status">
@@ -361,20 +383,25 @@
             }
         };
 
-        // Formatea la hora a 12h (AM/PM) sumando 2h si es para Chile
-        function format12h(val, useChile) {
-            let h = Math.floor(val / 100);
-            let m = val % 100;
-            
+        // Las zonas IANA aplican automáticamente el horario de verano de Chile.
+        const nicaParts = new Intl.DateTimeFormat('en-US', {timeZone:'America/Managua',year:'numeric',month:'2-digit',day:'2-digit',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+        const chileClock = new Intl.DateTimeFormat('en-US', {timeZone:'America/Santiago',hour:'numeric',minute:'2-digit',hour12:true});
+        const chileOffsetParts = new Intl.DateTimeFormat('en-US', {timeZone:'America/Santiago',timeZoneName:'longOffset',hour:'2-digit'});
+        function getChileOffset(date) {
+            const name = chileOffsetParts.formatToParts(date).find(p => p.type === 'timeZoneName').value;
+            const match = name.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);
+            return match ? (match[1] === '-' ? -1 : 1) * (Number(match[2])*60 + Number(match[3]||0)) : 0;
+        }
+        function format12h(val, useChile, baseDate) {
+            const h = Math.floor(val / 100), m = val % 100;
             if (useChile) {
-                h = (h + 2) % 24;
+                // Convertir la hora de Nicaragua del día correspondiente a un instante real.
+                const d = baseDate || new Date();
+                const parts = Object.fromEntries(nicaParts.formatToParts(d).map(p=>[p.type,p.value]));
+                const instant = new Date(Date.UTC(Number(parts.year),Number(parts.month)-1,Number(parts.day),h+6,m));
+                return chileClock.format(instant).replace(/\s/g,' ');
             }
-            
-            let ampm = h >= 12 ? 'PM' : 'AM';
-            let h12 = h % 12;
-            h12 = h12 ? h12 : 12; // el 0 se convierte en 12
-            
-            return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+            return `${h%12 || 12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`;
         }
 
         function isCurrentBlockActive(timeVal, block) {
@@ -408,18 +435,13 @@
                     mainClockLabel.innerText = 'HORA EN NICARAGUA';
                 }
 
-                // Cálculo de tiempo robusto para iOS
+                // Hora de Nicaragua, independiente de la zona del dispositivo.
                 const now = new Date();
-                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                const nicaDate = new Date(utc + (3600000 * -6));
-                
-                const hours = nicaDate.getHours();
-                const minutes = nicaDate.getMinutes();
-                const day = nicaDate.getDay(); // 0 = Domingo, 5 = Viernes
-                const currentTimeVal = (hours * 100) + minutes;
-
-                // Actualizar reloj principal
-                mainClock.innerText = format12h(currentTimeVal, useChileTime);
+                const parts = Object.fromEntries(nicaParts.formatToParts(now).map(p=>[p.type,p.value]));
+                const hours = Number(parts.hour), minutes = Number(parts.minute);
+                const day = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(parts.weekday);
+                const currentTimeVal = hours * 100 + minutes;
+                mainClock.innerText = useChileTime ? chileClock.format(now) : format12h(currentTimeVal, false);
 
                 // Determinar rutina activa
                 let routine = shift.routine_normal;
@@ -461,7 +483,7 @@
                 } else {
                     routine.forEach(block => {
                         let isActive = isCurrentBlockActive(currentTimeVal, block);
-                        let timeStr = `${format12h(block.start, useChileTime)} - ${format12h(block.end, useChileTime)}`;
+                        let timeStr = `${format12h(block.start, useChileTime, now)} - ${format12h(block.end, useChileTime, now)}`;
                         
                         let html = `
                             <div class="timeline-item" style="opacity: ${isActive ? '1' : '0.4'};">
@@ -485,8 +507,26 @@
 
         // Inicializar cuando el DOM esté listo (Solución para iOS)
         document.addEventListener("DOMContentLoaded", () => {
+            const picker = document.getElementById('shift-picker');
+            const trigger = document.getElementById('shift-trigger');
+            const options = [...document.querySelectorAll('.shift-option')];
+            const names = {A:'Turno A (Mañana)',B:'Turno B (Tarde)',C:'Turno C (Noche)'};
+            const closePicker = () => {picker.classList.remove('open');trigger.setAttribute('aria-expanded','false');};
+            trigger.addEventListener('click', () => {
+                const opened = picker.classList.toggle('open');
+                trigger.setAttribute('aria-expanded',String(opened));
+            });
+            options.forEach(option => option.addEventListener('click', () => {
+                const value = option.dataset.shift;
+                document.getElementById('shift-select').value = value;
+                document.getElementById('shift-current').textContent = names[value];
+                options.forEach(o=>{const active=o===option;o.classList.toggle('selected',active);o.setAttribute('aria-selected',String(active));});
+                closePicker();updateUI();trigger.focus();
+            }));
+            document.addEventListener('click', e => {if(!picker.contains(e.target))closePicker();});
+            document.addEventListener('keydown', e => {if(e.key==='Escape')closePicker();});
             updateUI();
-            setInterval(updateUI, 60000); // Actualizar cada minuto
+            setInterval(updateUI, 15000); // Actualizar cada minuto
         });
     </script>
 </body>
