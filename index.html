@@ -275,25 +275,25 @@
             100% { background-position: 0% center; }
         }
 
-        .shift-picker { position:relative; }
-        .shift-trigger { width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;padding:1rem 1.15rem;background:rgba(15,23,42,.85);border:1px solid rgba(148,163,184,.25);border-radius:14px;color:#f8fafc;font:inherit;font-size:1rem;cursor:pointer;transition:border-color .25s,box-shadow .25s; }
-        .shift-trigger:focus-visible,.shift-picker.open .shift-trigger {outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(56,189,248,.13);}
-        .shift-chevron {font-size:1.5rem;color:var(--accent);line-height:1;transition:transform .3s cubic-bezier(.2,.8,.2,1);}
-        .shift-picker.open .shift-chevron {transform:rotate(180deg);}
-        .shift-menu {position:absolute;top:calc(100% + 9px);left:0;right:0;z-index:20;padding:7px;background:#101b2d;border:1px solid rgba(148,163,184,.35);border-radius:17px;box-shadow:0 24px 65px rgba(0,0,0,.75);opacity:0;visibility:hidden;transform:translateY(-9px) scale(.98);transform-origin:top;transition:opacity .25s,transform .3s cubic-bezier(.2,.8,.2,1),visibility .3s;}
-        .shift-picker.open .shift-menu {opacity:1;visibility:visible;transform:translateY(0) scale(1);}
-        .shift-option {width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;padding:12px 13px;border:0;border-radius:11px;background:transparent;color:#f8fafc;font:inherit;cursor:pointer;transition:background .2s;}
-        .shift-option + .shift-option {margin-top:3px;}
-        .shift-option strong,.shift-option small {display:block;}
-        .shift-option strong {font-size:.95rem;font-weight:600;}
-        .shift-option small {font-size:.73rem;color:#94a3b8;margin-top:2px;}
-        .shift-option:hover,.shift-option:focus-visible,.shift-option.selected {background:rgba(56,189,248,.11);outline:none;}
-        .option-check {opacity:0;color:#38bdf8;font-size:1.2rem;}
-        .shift-option.selected .option-check {opacity:1;}
-        @media (prefers-reduced-motion:reduce) {.shift-menu,.shift-chevron,.shift-option {transition:none;}}
-
-        .shift-picker {position:relative;z-index:30;isolation:isolate}
-        .shift-menu {background-color:#101b2d!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;z-index:100}
+        .shift-picker {position:relative}
+        .shift-trigger {width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;padding:1rem 1.15rem;background:#101a2c;border:1px solid rgba(148,163,184,.3);border-radius:14px;color:#f8fafc;font:inherit;font-size:1rem;cursor:pointer}
+        .shift-trigger:focus-visible {outline:2px solid var(--accent);outline-offset:3px}
+        .shift-chevron {color:var(--accent);font-size:1.4rem}
+        .modal-backdrop {position:fixed;inset:0;z-index:9000;background:rgba(3,8,20,.86);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:opacity .28s,visibility .28s;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+        .modal-backdrop.open {opacity:1;visibility:visible}
+        .modal-panel {width:min(100%,430px);max-height:min(85dvh,640px);overflow-y:auto;background:#142137;border:1px solid #42536c;border-radius:24px;padding:22px;box-shadow:0 30px 90px #000c;transform:translateY(25px) scale(.96);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+        .modal-backdrop.open .modal-panel {transform:translateY(0) scale(1)}
+        .modal-header {display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px}
+        .modal-header h2 {font-size:1.35rem;font-weight:700}
+        .modal-header p {font-size:.78rem;color:#9aabc4;margin-top:4px}
+        .modal-close {width:36px;height:36px;border-radius:50%;border:1px solid #41506a;background:#22314a;color:#fff;font-size:1.35rem;cursor:pointer;flex-shrink:0}
+        .shift-option {width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;padding:17px 15px;border:1px solid #33435b;border-radius:15px;background:#0d192c;color:#f8fafc;font:inherit;cursor:pointer;margin-top:10px}
+        .shift-option strong,.shift-option small {display:block}
+        .shift-option strong {font-size:1rem}.shift-option small {font-size:.75rem;color:#9aabc4;margin-top:5px}
+        .shift-option.selected {background:#16344b;border-color:#38bdf8}
+        .option-check {opacity:0;color:#38bdf8;font-size:1.3rem}.shift-option.selected .option-check {opacity:1}
+        body.modal-open {overflow:hidden}
+        @media(prefers-reduced-motion:reduce){.modal-backdrop,.modal-panel{transition:none}}
         .dual-clocks {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:23px;text-align:left}
         .mini-clock {padding:14px 12px;border-radius:14px;background:#101a2c;border:1px solid rgba(148,163,184,.2);min-width:0}
         .mini-clock span {display:block;font-size:.76rem;color:#cbd5e1;white-space:nowrap}
@@ -305,38 +305,61 @@
         .loader-inner {width:min(100%,430px);text-align:center}
         .loader-heading {font-size:clamp(1.25rem,5vw,1.65rem);font-weight:700;color:#f8fafc}
         .heart {color:#ec4899;animation:heartbeat 1.1s ease-in-out infinite;display:inline-block}
-        .route-art {display:block;width:100%;max-width:340px;margin:24px auto 8px;overflow:visible}
-        .route-guide {fill:none;stroke:#43536c;stroke-width:2;stroke-dasharray:3 8;stroke-linecap:round}
-        .route-line {fill:none;stroke:url(#route-gradient);stroke-width:3;stroke-linecap:round;stroke-dasharray:320;stroke-dashoffset:320;animation:draw-route 1.75s ease-out forwards}
-        .flying-plane {offset-path:path('M42 120 Q165 -25 298 70');offset-distance:0%;animation:fly-route 1.75s ease-in-out forwards;transform:rotate(-10deg)}
+        .route-art {display:block;width:100%;max-width:380px;margin:14px auto 12px;overflow:visible}
+        .map-land {fill:#233c50;stroke:#4b7a88;stroke-width:1.3;stroke-linejoin:round}
+        .map-grid {stroke:#6b8093;stroke-width:.6;opacity:.22}
+        .route-guide {fill:none;stroke:#6d88a2;stroke-width:2;stroke-dasharray:3 7;stroke-linecap:round}
+        .route-line {fill:none;stroke:url(#route-gradient);stroke-width:3.5;stroke-linecap:round;stroke-dasharray:430;stroke-dashoffset:430;animation:draw-route 2.25s ease-in-out forwards;filter:drop-shadow(0 0 5px #38bdf8)}
+        .flying-plane {filter:drop-shadow(0 0 5px #38bdf8)}
+        .map-marker {stroke:#e9f6ff;stroke-width:1.5}
+        .map-label {fill:#e4efff;font-size:13px;font-weight:600;paint-order:stroke;stroke:#102036;stroke-width:3px;stroke-linejoin:round}
         .loader-message {font-size:.86rem;color:#a5b4ca}
         .loader-progress {height:3px;background:#28364d;border-radius:4px;overflow:hidden;margin:20px auto 0;width:68%}
-        .loader-progress span {display:block;height:100%;background:linear-gradient(90deg,#38bdf8,#ec4899);animation:load-bar 1.85s ease forwards}
+        .loader-progress span {display:block;height:100%;background:linear-gradient(90deg,#38bdf8,#ec4899);animation:load-bar 2.3s ease forwards}
         @keyframes draw-route {to{stroke-dashoffset:0}}
         @keyframes fly-route {to{offset-distance:100%}}
         @keyframes load-bar {from{width:0}to{width:100%}}
         @keyframes heartbeat {50%{transform:scale(1.22)}}
-        @media (prefers-reduced-motion:reduce) {.heart,.route-line,.flying-plane,.loader-progress span{animation:none}.route-line{stroke-dashoffset:0}.flying-plane{offset-distance:100%}}
+        @media (prefers-reduced-motion:reduce) {.heart,.route-line,.loader-progress span{animation:none}.route-line{stroke-dashoffset:0}.flying-plane{offset-distance:100%}}
     </style>
 </head>
 <body>
     <div id="connect-loader" class="connect-loader" role="status" aria-live="polite">
       <div class="loader-inner">
         <div class="loader-heading">Conectando nuestros horarios <span class="heart">♥</span></div>
-        <svg class="route-art" viewBox="0 0 340 170" aria-hidden="true">
-          <defs><linearGradient id="route-gradient"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs>
-          <path class="route-guide" d="M42 120 Q165 -25 298 70"/>
-          <path class="route-line" d="M42 120 Q165 -25 298 70"/>
-          <circle cx="42" cy="120" r="7" fill="#38bdf8"/><circle cx="298" cy="70" r="7" fill="#ec4899"/>
-          <g class="flying-plane"><text x="0" y="0" text-anchor="middle" font-size="25">✈</text></g>
-          <text x="42" y="151" text-anchor="middle" fill="#9edfff" font-size="13">Nicaragua</text>
-          <text x="298" y="102" text-anchor="middle" fill="#f6a5cc" font-size="13">Chile</text>
+        <svg class="route-art" viewBox="0 0 380 440" aria-label="Mapa ilustrado de la ruta entre Nicaragua y Chile">
+          <defs><linearGradient id="route-gradient" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs>
+          <g aria-hidden="true">
+            <path class="map-land" d="M13 24 L78 24 96 46 114 54 121 75 143 87 159 107 171 117 163 130 153 132 146 120 130 113 119 103 102 101 91 89 78 83 67 67 52 59 40 44 21 44Z"/>
+            <path class="map-land" d="M161 123 L178 126 185 139 204 146 218 143 234 152 252 157 273 173 298 187 320 202 335 229 327 258 313 283 303 307 285 325 273 350 262 377 247 405 230 428 218 409 223 386 215 365 218 346 206 324 195 300 188 275 177 257 172 235 156 214 145 192 152 173 146 154Z"/>
+            <path class="map-grid" d="M0 110H380 M0 220H380 M0 330H380 M95 0V440 M190 0V440 M285 0V440"/>
+          </g>
+          <path id="map-route-guide" class="route-guide" d="M150 116 Q82 225 232 355"/>
+          <path id="map-route-line" class="route-line" d="M150 116 Q82 225 232 355"/>
+          <circle cx="150" cy="116" r="6" fill="#38bdf8" class="map-marker"/>
+          <circle cx="232" cy="355" r="6" fill="#ec4899" class="map-marker"/>
+          <text x="166" y="107" class="map-label">Nicaragua</text>
+          <text x="244" y="357" class="map-label">Chile</text>
+          <g id="map-plane" class="flying-plane" transform="translate(150 116)">
+            <circle r="17" fill="#0d2137" stroke="#4bc9ff" stroke-width="1.2"/>
+            <path d="M0 -13 L4 -2 13 3 13 7 3 5 3 11 7 14 7 16 0 13 -7 16 -7 14 -3 11 -3 5 -13 7 -13 3 -4 -2Z" fill="#ffffff"/>
+          </g>
         </svg>
         <p class="loader-message">De Nicaragua a Chile, siempre conectados</p>
         <div class="loader-progress"><span></span></div>
       </div>
     </div>
 
+    <div class="modal-backdrop" id="shift-modal" aria-hidden="true">
+      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-header"><div><h2 id="modal-title">Seleccionar turno</h2><p>Elige el horario de trabajo de Snayder</p></div><button type="button" class="modal-close" id="modal-close" aria-label="Cerrar ventana">×</button></div>
+                    <div class="shift-options" id="shift-menu" role="listbox" aria-label="Selecciona el turno">
+                        <button type="button" class="shift-option" role="option" data-shift="A" aria-selected="false"><span><strong>Turno A</strong><small>Mañana · 7:00 AM – 3:00 PM</small></span><span class="option-check">✓</span></button>
+                        <button type="button" class="shift-option selected" role="option" data-shift="B" aria-selected="true"><span><strong>Turno B</strong><small>Tarde · 3:00 PM – 11:00 PM</small></span><span class="option-check">✓</span></button>
+                        <button type="button" class="shift-option" role="option" data-shift="C" aria-selected="false"><span><strong>Turno C</strong><small>Noche · 11:00 PM – 7:00 AM</small></span><span class="option-check">✓</span></button>
+                    </div>
+      </div>
+    </div>
     <div class="container">
         <div class="header">
             <h1>Horario de Snayder</h1>
@@ -347,14 +370,9 @@
             <div class="selector-group">
                 <label for="shift-select">Selecciona el Turno</label>
                 <div class="shift-picker" id="shift-picker">
-                    <button type="button" class="shift-trigger" id="shift-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="shift-menu">
+                    <button type="button" class="shift-trigger" id="shift-trigger" aria-haspopup="dialog" aria-expanded="false" aria-controls="shift-menu">
                         <span id="shift-current">Turno B (Tarde)</span><span class="shift-chevron" aria-hidden="true">⌄</span>
                     </button>
-                    <div class="shift-menu" id="shift-menu" role="listbox" aria-label="Selecciona el turno">
-                        <button type="button" class="shift-option" role="option" data-shift="A" aria-selected="false"><span><strong>Turno A</strong><small>Mañana · 7:00 AM – 3:00 PM</small></span><span class="option-check">✓</span></button>
-                        <button type="button" class="shift-option selected" role="option" data-shift="B" aria-selected="true"><span><strong>Turno B</strong><small>Tarde · 3:00 PM – 11:00 PM</small></span><span class="option-check">✓</span></button>
-                        <button type="button" class="shift-option" role="option" data-shift="C" aria-selected="false"><span><strong>Turno C</strong><small>Noche · 11:00 PM – 7:00 AM</small></span><span class="option-check">✓</span></button>
-                    </div>
                     <input type="hidden" id="shift-select" value="B">
                 </div>
             </div>
@@ -559,7 +577,7 @@
 
         // Inicializar cuando el DOM esté listo (Solución para iOS)
         document.addEventListener("DOMContentLoaded", () => {
-            const picker = document.getElementById('shift-picker');
+            const modal = document.getElementById('shift-modal');
             const trigger = document.getElementById('shift-trigger');
             const options = [...document.querySelectorAll('.shift-option')];
             const names = {A:'Turno A (Mañana)',B:'Turno B (Tarde)',C:'Turno C (Noche)'};
@@ -569,23 +587,61 @@
                 document.getElementById('shift-current').textContent = names[savedShift];
                 options.forEach(o => {const active=o.dataset.shift===savedShift;o.classList.toggle('selected',active);o.setAttribute('aria-selected',String(active));});
             }
-            const closePicker = () => {picker.classList.remove('open');trigger.setAttribute('aria-expanded','false');};
-            trigger.addEventListener('click', () => {
-                const opened = picker.classList.toggle('open');
-                trigger.setAttribute('aria-expanded',String(opened));
-            });
+            const closePicker = () => {modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');trigger.setAttribute('aria-expanded','false');trigger.focus();};
+            trigger.addEventListener('click', () => {modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');trigger.setAttribute('aria-expanded','true');document.getElementById('modal-close').focus();});
+            document.getElementById('modal-close').addEventListener('click',closePicker);
+            modal.addEventListener('click',e=>{if(e.target===modal)closePicker();});
             options.forEach(option => option.addEventListener('click', () => {
                 const value = option.dataset.shift;
                 document.getElementById('shift-select').value = value;
                 try {localStorage.setItem('sndr-selected-shift',value)} catch(e) {}
                 document.getElementById('shift-current').textContent = names[value];
                 options.forEach(o=>{const active=o===option;o.classList.toggle('selected',active);o.setAttribute('aria-selected',String(active));});
-                closePicker();updateUI();trigger.focus();
+                closePicker();updateUI();
             }));
-            document.addEventListener('click', e => {if(!picker.contains(e.target))closePicker();});
-            document.addEventListener('keydown', e => {if(e.key==='Escape')closePicker();});
+            document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closePicker();});
             updateUI();
             setInterval(updateUI, 15000);
+            const routeGuide=document.getElementById('map-route-guide');
+            const routeLine=document.getElementById('map-route-line');
+            const plane=document.getElementById('map-plane');
+            const routeMessage=document.querySelector('.loader-message');
+            const nicaPath='M150 116 Q82 225 232 355';
+            const chilePath='M232 355 Q82 225 150 116';
+            function setRoute(fromChile) {
+                const d=fromChile?chilePath:nicaPath;
+                routeGuide.setAttribute('d',d);routeLine.setAttribute('d',d);
+                routeMessage.textContent=fromChile?'De Chile a Nicaragua, siempre conectados':'De Nicaragua a Chile, siempre conectados';
+                const length=routeLine.getTotalLength();
+                routeLine.style.animation='none';routeLine.style.strokeDasharray=String(length);routeLine.style.strokeDashoffset=String(length);
+                const start=performance.now();const duration=2250;
+                function frame(t){
+                    const progress=Math.min(1,(t-start)/duration);
+                    const eased=progress<.5?2*progress*progress:1-Math.pow(-2*progress+2,2)/2;
+                    const point=routeLine.getPointAtLength(length*eased);
+                    const next=routeLine.getPointAtLength(Math.min(length,length*eased+2));
+                    const angle=Math.atan2(next.y-point.y,next.x-point.x)*180/Math.PI+90;
+                    plane.setAttribute('transform',`translate(${point.x} ${point.y}) rotate(${angle})`);
+                    routeLine.style.strokeDashoffset=String(length*(1-eased));
+                    if(progress<1)requestAnimationFrame(frame);
+                }
+                requestAnimationFrame(frame);
+            }
+            let countryHint='';
+            try {const tz=Intl.DateTimeFormat().resolvedOptions().timeZone;countryHint=tz==='America/Santiago'||tz==='America/Punta_Arenas'?'CL':tz==='America/Managua'?'NI':'';}catch(e){}
+            setRoute(countryHint==='CL');
+            // IP pública aproximada: solo país, nunca dirección precisa. No bloquea la carga.
+            if(typeof fetch==='function') {
+                const controller=typeof AbortController!=='undefined'?new AbortController():null;
+                const timeout=setTimeout(()=>{if(controller)controller.abort()},1250);
+                fetch('https://ipwho.is/',controller?{signal:controller.signal}:{})
+                  .then(r=>r.ok?r.json():null).then(data=>{
+                    if(data&&data.success!==false&&(data.country_code==='CL'||data.country_code==='NI')) {
+                        // Aplicar únicamente si todavía está visible el loader.
+                        if(!document.getElementById('connect-loader').classList.contains('hidden'))setRoute(data.country_code==='CL');
+                    }
+                  }).catch(()=>{}).finally(()=>clearTimeout(timeout));
+            }
             const loader = document.getElementById('connect-loader');
             window.setTimeout(() => loader.classList.add('hidden'), 1950);
         });
