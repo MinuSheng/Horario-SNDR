@@ -280,7 +280,7 @@
         .shift-trigger:focus-visible,.shift-picker.open .shift-trigger {outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(56,189,248,.13);}
         .shift-chevron {font-size:1.5rem;color:var(--accent);line-height:1;transition:transform .3s cubic-bezier(.2,.8,.2,1);}
         .shift-picker.open .shift-chevron {transform:rotate(180deg);}
-        .shift-menu {position:absolute;top:calc(100% + 9px);left:0;right:0;z-index:20;padding:7px;background:#172235;border:1px solid rgba(148,163,184,.22);border-radius:17px;box-shadow:0 20px 45px rgba(0,0,0,.45);opacity:0;visibility:hidden;transform:translateY(-9px) scale(.98);transform-origin:top;transition:opacity .25s,transform .3s cubic-bezier(.2,.8,.2,1),visibility .3s;}
+        .shift-menu {position:absolute;top:calc(100% + 9px);left:0;right:0;z-index:20;padding:7px;background:#101b2d;border:1px solid rgba(148,163,184,.35);border-radius:17px;box-shadow:0 24px 65px rgba(0,0,0,.75);opacity:0;visibility:hidden;transform:translateY(-9px) scale(.98);transform-origin:top;transition:opacity .25s,transform .3s cubic-bezier(.2,.8,.2,1),visibility .3s;}
         .shift-picker.open .shift-menu {opacity:1;visibility:visible;transform:translateY(0) scale(1);}
         .shift-option {width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;padding:12px 13px;border:0;border-radius:11px;background:transparent;color:#f8fafc;font:inherit;cursor:pointer;transition:background .2s;}
         .shift-option + .shift-option {margin-top:3px;}
@@ -291,9 +291,51 @@
         .option-check {opacity:0;color:#38bdf8;font-size:1.2rem;}
         .shift-option.selected .option-check {opacity:1;}
         @media (prefers-reduced-motion:reduce) {.shift-menu,.shift-chevron,.shift-option {transition:none;}}
+
+        .shift-picker {position:relative;z-index:30;isolation:isolate}
+        .shift-menu {background-color:#101b2d!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;z-index:100}
+        .dual-clocks {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:23px;text-align:left}
+        .mini-clock {padding:14px 12px;border-radius:14px;background:#101a2c;border:1px solid rgba(148,163,184,.2);min-width:0}
+        .mini-clock span {display:block;font-size:.76rem;color:#cbd5e1;white-space:nowrap}
+        .mini-clock strong {display:block;font-size:clamp(1.15rem,5vw,1.6rem);font-weight:700;margin-top:5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+        .nica-mini strong {color:var(--accent)} .chile-mini strong {color:var(--chile-color)}
+        .time-difference {color:var(--text-muted);font-size:.76rem;margin-top:12px}
+        .connect-loader {position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,#0b1222,#18243a);display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity .55s ease,visibility .55s ease}
+        .connect-loader.hidden {opacity:0;visibility:hidden;pointer-events:none}
+        .loader-inner {width:min(100%,430px);text-align:center}
+        .loader-heading {font-size:clamp(1.25rem,5vw,1.65rem);font-weight:700;color:#f8fafc}
+        .heart {color:#ec4899;animation:heartbeat 1.1s ease-in-out infinite;display:inline-block}
+        .route-art {display:block;width:100%;max-width:340px;margin:24px auto 8px;overflow:visible}
+        .route-guide {fill:none;stroke:#43536c;stroke-width:2;stroke-dasharray:3 8;stroke-linecap:round}
+        .route-line {fill:none;stroke:url(#route-gradient);stroke-width:3;stroke-linecap:round;stroke-dasharray:320;stroke-dashoffset:320;animation:draw-route 1.75s ease-out forwards}
+        .flying-plane {offset-path:path('M42 120 Q165 -25 298 70');offset-distance:0%;animation:fly-route 1.75s ease-in-out forwards;transform:rotate(-10deg)}
+        .loader-message {font-size:.86rem;color:#a5b4ca}
+        .loader-progress {height:3px;background:#28364d;border-radius:4px;overflow:hidden;margin:20px auto 0;width:68%}
+        .loader-progress span {display:block;height:100%;background:linear-gradient(90deg,#38bdf8,#ec4899);animation:load-bar 1.85s ease forwards}
+        @keyframes draw-route {to{stroke-dashoffset:0}}
+        @keyframes fly-route {to{offset-distance:100%}}
+        @keyframes load-bar {from{width:0}to{width:100%}}
+        @keyframes heartbeat {50%{transform:scale(1.22)}}
+        @media (prefers-reduced-motion:reduce) {.heart,.route-line,.flying-plane,.loader-progress span{animation:none}.route-line{stroke-dashoffset:0}.flying-plane{offset-distance:100%}}
     </style>
 </head>
 <body>
+    <div id="connect-loader" class="connect-loader" role="status" aria-live="polite">
+      <div class="loader-inner">
+        <div class="loader-heading">Conectando nuestros horarios <span class="heart">♥</span></div>
+        <svg class="route-art" viewBox="0 0 340 170" aria-hidden="true">
+          <defs><linearGradient id="route-gradient"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs>
+          <path class="route-guide" d="M42 120 Q165 -25 298 70"/>
+          <path class="route-line" d="M42 120 Q165 -25 298 70"/>
+          <circle cx="42" cy="120" r="7" fill="#38bdf8"/><circle cx="298" cy="70" r="7" fill="#ec4899"/>
+          <g class="flying-plane"><text x="0" y="0" text-anchor="middle" font-size="25">✈</text></g>
+          <text x="42" y="151" text-anchor="middle" fill="#9edfff" font-size="13">Nicaragua</text>
+          <text x="298" y="102" text-anchor="middle" fill="#f6a5cc" font-size="13">Chile</text>
+        </svg>
+        <p class="loader-message">De Nicaragua a Chile, siempre conectados</p>
+        <div class="loader-progress"><span></span></div>
+      </div>
+    </div>
 
     <div class="container">
         <div class="header">
@@ -333,6 +375,11 @@
             
             <div class="main-clock" id="main-clock">--:--</div>
             <div class="clock-label-big" id="main-clock-label">ZONA HORARIA</div>
+            <div class="dual-clocks" aria-label="Relojes de Nicaragua y Chile">
+                <div class="mini-clock nica-mini"><span>🇳🇮 Nicaragua</span><strong id="clock-nica">--:--</strong></div>
+                <div class="mini-clock chile-mini"><span>🇨🇱 Chile</span><strong id="clock-chile">--:--</strong></div>
+            </div>
+            <div class="time-difference" id="time-difference">Calculando diferencia horaria…</div>
         </div>
 
         <div class="card">
@@ -385,6 +432,7 @@
 
         // Las zonas IANA aplican automáticamente el horario de verano de Chile.
         const nicaParts = new Intl.DateTimeFormat('en-US', {timeZone:'America/Managua',year:'numeric',month:'2-digit',day:'2-digit',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+        const nicaClock = new Intl.DateTimeFormat('en-US', {timeZone:'America/Managua',hour:'numeric',minute:'2-digit',hour12:true});
         const chileClock = new Intl.DateTimeFormat('en-US', {timeZone:'America/Santiago',hour:'numeric',minute:'2-digit',hour12:true});
         const chileOffsetParts = new Intl.DateTimeFormat('en-US', {timeZone:'America/Santiago',timeZoneName:'longOffset',hour:'2-digit'});
         function getChileOffset(date) {
@@ -437,6 +485,10 @@
 
                 // Hora de Nicaragua, independiente de la zona del dispositivo.
                 const now = new Date();
+                document.getElementById('clock-nica').textContent = nicaClock.format(now);
+                document.getElementById('clock-chile').textContent = chileClock.format(now);
+                const diff = (getChileOffset(now) + 360) / 60;
+                document.getElementById('time-difference').textContent = diff === 0 ? 'Ambos países tienen la misma hora' : `Chile está ${Math.abs(diff)} ${Math.abs(diff) === 1 ? 'hora' : 'horas'} ${diff > 0 ? 'adelante' : 'atrás'} de Nicaragua`;
                 const parts = Object.fromEntries(nicaParts.formatToParts(now).map(p=>[p.type,p.value]));
                 const hours = Number(parts.hour), minutes = Number(parts.minute);
                 const day = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(parts.weekday);
@@ -511,6 +563,12 @@
             const trigger = document.getElementById('shift-trigger');
             const options = [...document.querySelectorAll('.shift-option')];
             const names = {A:'Turno A (Mañana)',B:'Turno B (Tarde)',C:'Turno C (Noche)'};
+            const savedShift = (() => {try{return localStorage.getItem('sndr-selected-shift')}catch(e){return null}})();
+            if (savedShift && names[savedShift]) {
+                document.getElementById('shift-select').value = savedShift;
+                document.getElementById('shift-current').textContent = names[savedShift];
+                options.forEach(o => {const active=o.dataset.shift===savedShift;o.classList.toggle('selected',active);o.setAttribute('aria-selected',String(active));});
+            }
             const closePicker = () => {picker.classList.remove('open');trigger.setAttribute('aria-expanded','false');};
             trigger.addEventListener('click', () => {
                 const opened = picker.classList.toggle('open');
@@ -519,6 +577,7 @@
             options.forEach(option => option.addEventListener('click', () => {
                 const value = option.dataset.shift;
                 document.getElementById('shift-select').value = value;
+                try {localStorage.setItem('sndr-selected-shift',value)} catch(e) {}
                 document.getElementById('shift-current').textContent = names[value];
                 options.forEach(o=>{const active=o===option;o.classList.toggle('selected',active);o.setAttribute('aria-selected',String(active));});
                 closePicker();updateUI();trigger.focus();
@@ -526,7 +585,9 @@
             document.addEventListener('click', e => {if(!picker.contains(e.target))closePicker();});
             document.addEventListener('keydown', e => {if(e.key==='Escape')closePicker();});
             updateUI();
-            setInterval(updateUI, 15000); // Actualizar cada minuto
+            setInterval(updateUI, 15000);
+            const loader = document.getElementById('connect-loader');
+            window.setTimeout(() => loader.classList.add('hidden'), 1950);
         });
     </script>
 </body>
